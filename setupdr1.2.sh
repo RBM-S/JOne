@@ -58,7 +58,8 @@ if [[ "$PARTCONFIRM" == "y" || "$PARTCONFIRM" == "Y" ]]; then
             echo -e "${YELLOW}Does everything match up? (y/n): ${RESET}"
             read UEFIPARTCONFIRM
             DSKSZB=$(lsblk -b -o SIZE -n $PARTON2)
-            DSKSZGT=$((DSKSZB / 1024 / 1024 / 1024))
+            DSKSZGT=$(echo "$DSKSZB / 1024 / 1024 / 1024" | bc)
+
 
             if [[ "$UNIT" == "G" ]]; then
                 GTSIZE=$SIZE
