@@ -14,9 +14,9 @@ echo -e "${GREEN}Sect 1: Disks and Partitioning${RESET}"
 echo -e "${RED}This will erase all data on your disk, so make sure to backup your data, otherwise, continue.${RESET}"
 lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
 
-echo -n
+echo -e -n ""
 
-echo -n "${YELLOW}Would you like to partition your disk? (OPTIONAL) (y/n): ${RESET}"
+echo -e -n "${YELLOW}Would you like to partition your disk? (OPTIONAL) (y/n): ${RESET}"
 read -n 1 PARTCONFIRM
 
 if [[ "$PARTCONFIRM" == "y" || "$PARTCONFIRM" == "Y" ]]; then
@@ -26,14 +26,14 @@ if [[ "$PARTCONFIRM" == "y" || "$PARTCONFIRM" == "Y" ]]; then
     read -p "${YELLOW}Select a number: ${RESET}" PARTYPSEL
     if [[ "$PARTYPSEL" == 1 || "$PARTYPSEL" == "One" ]]; then
         echo -e "${GREEN}Automatic Partitioning selected!${RESET}"
-        echo -n "${YELLOW}Select the Disk to partition: ${RESET}"
+        echo -e -n "${YELLOW}Select the Disk to partition: ${RESET}"
         read PARTON2
         if [[ ! -e "$PARTON2" ]]; then
             echo -e "${RED}ERROR: Disk $PARTON2 does not exist."
             exit 1
         fi
         echo -e "${YELLOW}NOTE: Use G for Gigabytes and T for Terabytes.${RED}"
-        echo -n "${YELLOW}Enter the size for the new partition: "
+        echo -e -n "${YELLOW}Enter the size for the new partition: "
         read GTSIZE
         if [[ "$GTSIZE" =~ ^[0-9]+(G|T)$ ]]; then
             SIZE=${GTSIZE%[GT]}
@@ -43,9 +43,9 @@ if [[ "$PARTCONFIRM" == "y" || "$PARTCONFIRM" == "Y" ]]; then
             exit 1
         fi
         echo -e "${RED}WARNING: Do not use spaces in the label.${RESET}"
-        echo -n "${YELLOW}Select the partition label/name: ${RESET}"
+        echo -e -n "${YELLOW}Select the partition label/name: ${RESET}"
         read PARTLABEL
-        echo -n "${YELLOW}What type is your motherboard? (UEFI/BIOS): ${RESET}"
+        echo -e -n "${YELLOW}What type is your motherboard? (UEFI/BIOS): ${RESET}"
         read MRDTPE 
         if [[ "$MRDTPE" == "UEFI" ]]; then
             echo -e "${YELLOW}Since you are on UEFI, the script will create a GPT partition table.${RESET}"
@@ -133,7 +133,7 @@ elif [[ "$PARTCONFIRM" == "n" || "$PARTCONFIRM" == "N" ]]; then
 fi
 
 while true; do
-    echo -n "${YELLOW}Enter the partition to format: ${RESET}"
+    echo -e -n "${YELLOW}Enter the partition to format: ${RESET}"
     read PARTON1
 
     if mount | grep -q "$PARTON1"; then
