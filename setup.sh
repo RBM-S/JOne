@@ -206,7 +206,7 @@ declare -A real_krnls=(
 )
 
 
-getpacksc="pacstrap -K /mnt base linux linux-firmware"
+getpacksc="pacstrap -K --noconfirm /mnt base linux linux-firmware"
 
 while true; do
     echo -e "${YELLOW}Do you want to select the kernel you want to use? If not, the regular linux kernel will be installed. (y/n): ${RESET}"
@@ -226,7 +226,7 @@ while true; do
             if [[ -n "${real_krnls[$kchi]}" ]]; then
                 getpacksc="$getpacksc ${real_krnls[$kchi]}"
             elif [[ "$kchi" == 'all' || "$kchi" == 'All' ]]; then
-                getpacksc="pacstrap -K /mnt base linux linux-firmware ${real_krnls[@]}"
+                getpacksc="pacstrap -K --noconfirm /mnt base linux linux-firmware ${real_krnls[@]}"
                 break 
             else
                 echo -e "${RED}Invalid kernel option: $kchi${RESET}"
@@ -234,7 +234,6 @@ while true; do
             fi
         done
 
-        
         if [[ "$getpacksc" == *"${real_krnls["linux-lts"]}"* || "$getpacksc" == *"${real_krnls["linux-hardened"]}"* || "$getpacksc" == *"${real_krnls["linux-zen"]}"* || "$getpacksc" == *"${real_krnls["linux-rt"]}"* ]]; then
             echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
             break 
@@ -277,6 +276,7 @@ echo -e "${GREEN}Sit back and relax while kernel installs!${RESET}"
 sleep 2
 
 eval "$getpacksc"
+
 
 
 
