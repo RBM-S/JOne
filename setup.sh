@@ -364,7 +364,7 @@ elif [[ "$accek" == "n" || "$accek" == 'n' ]]; then
         while true; do
             echo -e "${YELLOW}Enter time manually (YYYY-MM-DD HH:MM:SS)"
         read tinp
-        if [[ "$tinp" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
+        if [[ -n "$tinp" ]]; then
             sudo hwclock --set --date="$tinp"
             echo -e "${GREEN}Time set as $tinp!${RESET}"
             break
