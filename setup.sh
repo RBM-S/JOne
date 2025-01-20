@@ -353,7 +353,7 @@ elif [[ "$accek" == "n" || "$accek" == "N" ]]; then
         while true; do
             echo -e "${YELLOW}Enter time manually (YYYY-MM-DD HH:MM:SS): ${RESET}"
             read tinp
-            if [[ "$tinp" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
+            if [[ "$tinp" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
                 sudo hwclock --set --date="$tinp"
                 echo -e "${GREEN}Time set as $tinp!${RESET}"
                 break
@@ -363,6 +363,7 @@ elif [[ "$accek" == "n" || "$accek" == "N" ]]; then
         done
     fi
 fi
+
 
 
 clear
