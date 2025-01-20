@@ -198,7 +198,6 @@ done
 clear
 echo -e "${GREEN}Sect 2: Installing Kernel${RESET}"
 
-
 declare -A real_krnls=(
     ["linux-lts"]="linux-lts"
     ["linux-hardened"]="linux-hardened"
@@ -223,15 +222,23 @@ while true; do
         echo -n -e "${YELLOW}Name one or multiple kernel options (separated by space): ${RESET}"
         read -a kchi_list
 
-        
         for kchi in "${kchi_list[@]}"; do
             if [[ -n "${real_krnls[$kchi]}" ]]; then
                 getpacksc="$getpacksc ${real_krnls[$kchi]}"
+            elif [[ "$kchi" == 'all' || "$kchi" == 'All' ]]; then
+                getpacksc="pacstrap -K /mnt base linux linux-firmware ${real_krnls[@]}"
+                break 
             else
                 echo -e "${RED}Invalid kernel option: $kchi${RESET}"
                 continue
             fi
         done
+
+        
+        if [[ "$getpacksc" == *"${real_krnls["linux-lts"]}"* || "$getpacksc" == *"${real_krnls["linux-hardened"]}"* || "$getpacksc" == *"${real_krnls["linux-zen"]}"* || "$getpacksc" == *"${real_krnls["linux-rt"]}"* ]]; then
+            echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
+            break 
+        fi
 
         echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
         echo -e "${YELLOW}Press Spacebar to continue or Backspace to cancel.${RESET}"
@@ -247,7 +254,7 @@ while true; do
                 echo -e "${GREEN}Validated!${RESET}"
                 sleep 2
                 clear
-                break  
+                break 
             else
                 echo -e "${RED}No valid kernels selected. Restarting...${RESET}"
                 continue
@@ -255,11 +262,6 @@ while true; do
         fi
 
     elif [[ "$mrekrnl" == 'N' || "$mrekrnl" == 'n' ]]; then
-        echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
-        break  
-
-    elif [[ "$mrekrnl" == 'all' || "$mrekrnl" == 'All' ]]; then
-        getpacksc="pacstrap -K /mnt base linux linux-firmware ${real_krnls[@]}"
         echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
         break 
 
@@ -273,7 +275,6 @@ echo -e "${GREEN}Press any key to begin downloading kernel...${RESET}"
 read -n 1 -s
 echo -e "${GREEN}Sit back and relax while kernel installs!${RESET}"
 sleep 2
-
 
 eval "$getpacksc"
 
