@@ -426,88 +426,95 @@ sudo sed -i "s/127.0.1.1\s.*$/127.0.1.1\t$hostname/" /etc/hosts
 echo -e "${GREEN}$hostholder is now your hostname.${RESET}"
 
 clear
-echo "${GREEN}Network Configuration${RESET}"
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+RESET='\033[0m'
+
+echo -e "${GREEN}Network Configuration${RESET}"
 echo ""
 echo ""
 echo ""
-echo "${GREEN}Press any key to continue...${RESET}"
+echo -e "${GREEN}Press any key to continue...${RESET}"
 read -n 1 -s
 sleep 1
-echo "${YELLOW}Checkng your Network Connection..${RESET}"
+echo -e "${YELLOW}Checking your Network Connection...${RESET}"
 ping -q -c 1 -W 2 "wiki.archlinux.org"
 if [[ $? -ne 0 ]]; then
-    echo -e "${RED}Network is not connected, trying different host..${RESET}"
+    echo -e "${RED}Network is not connected, trying different host...${RESET}"
     ping -q -c 1 -W 2 "github.com"
     if [[ $? -ne 0 ]]; then
-        echo -e "${YELLOW}Note: Type skip to continue setup with no Wi-Fi connection."
-        echo -e "${RED}Network is not connected, lets get you connected.${RESET}"
+        echo -e "${YELLOW}Note: Type 'skip' to continue setup with no Wi-Fi connection.${RESET}"
+        echo -e "${RED}Network is not connected, let's get you connected.${RESET}"
         echo -e -n "${YELLOW}What is your wireless interface name? ${RESET}"
         read wafai
         if [[ "$wafai" == "skip" ]]; then
-            echo -e "${YELLOW}Skipping Network Configuration..${RESET}"
-        sudo ip link set "$wafai"
-        while true; do
-            echo -e "${YELLOW}Scanning available Wi-Fi networks on your interface..${RESET}"
-            scopt=$(sudo iwlist "$wafai" scanning | grep 'ESSID' | sed 's/ESSID://g')
-            if [[ -z "$scopt" ]]; then
-                echo -e "${RED}No networks were found, check your router and retry!${RESET}"
-                echo -e "${RED}Press any button to retry...${RED}"
-                read -n 1 -s
-                continue
-            fi
+            echo -e "${YELLOW}Skipping Network Configuration...${RESET}"
+        else
+            sudo ip link set "$wafai" up
+            while true; do
+                echo -e "${YELLOW}Scanning available Wi-Fi networks on your interface...${RESET}"
+                scopt=$(sudo iwlist "$wafai" scanning | grep 'ESSID' | sed 's/ESSID://g')
+                if [[ -z "$scopt" ]]; then
+                    echo -e "${RED}No networks were found, check your router and retry!${RESET}"
+                    echo -e "${RED}Press any button to retry...${RED}"
+                    read -n 1 -s
+                    continue
+                fi
 
-            echo -e "${GREEN}Wi-Fi Networks on $wafai: ${RESET}"
-            ntlst=()
-            index=1
-            while IFS= read -r network; do
-                echo "$index) $network"
-                ntlst+=("$network")
-                ((index++))
-            done <<< "$scopt"
+                echo -e "${GREEN}Wi-Fi Networks on $wafai:${RESET}"
+                ntlst=()
+                index=1
+                while IFS= read -r network; do
+                    echo "$index) $network"
+                    ntlst+=("$network")
+                    ((index++))
+                done <<< "$scopt"
 
-            echo -e "${YELLOW}NOTE: Type skip to continue setup with no Wi-Fi connection."
+                echo -e "${YELLOW}NOTE: Type 'skip' to continue setup with no Wi-Fi connection.${RESET}"
 
-            echo -e "${YELLOW}Enter your Wi-Fi's number off the list.${RESET}"
-            echo -e -n "Number: "
-            read -r wislect
+                echo -e "${YELLOW}Enter your Wi-Fi's number off the list.${RESET}"
+                echo -e -n "Number: "
+                read -r wislect
 
-            if ! [[ "$wislect" =~ ^[0-9]+$ ]] || [ "$wislect" -lt 1 ] || [ "$wislect" -gt "${#ntlst[@]}" ]; then
-                echo -e "${RED}ERROR: Unknown Wi-Fi selection.${RESET}"
-                sleep 1
-                continue
-            elif [[ "$wislect" == "skip" ]]; then
-                echo -e "${YELLOW}Skipping Network Configuration..${RESET}"
-                sleep 1
-                break
+                if ! [[ "$wislect" =~ ^[0-9]+$ ]] || [ "$wislect" -lt 1 ] || [ "$wislect" -gt "${#ntlst[@]}" ]; then
+                    echo -e "${RED}ERROR: Unknown Wi-Fi selection.${RESET}"
+                    sleep 1
+                    continue
+                elif [[ "$wislect" == "skip" ]]; then
+                    echo -e "${YELLOW}Skipping Network Configuration...${RESET}"
+                    sleep 1
+                    break
+                fi
 
-            selssid="${ntlst[$wislect]}"
-            read -p "${YELLOW}Enter passphrase for $selssid: ${RESET}" -s pssp
-            echo ""
+                selssid="${ntlst[$wislect]}"
+                read -p "${YELLOW}Enter passphrase for $selssid: ${RESET}" -s pssp
+                echo ""
 
-            echo -e "network={
-                ssid=\"$selssid\"
-                psk=\"$pssp\"
-            }" | sudo tee /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null
+                echo -e "network={
+                    ssid=\"$selssid\"
+                    psk=\"$pssp\"
+                }" | sudo tee /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null
 
+                echo -e "${GREEN}Connecting to $selssid...${RESET}"
+                sudo wpa_cli reconfigure
 
-            echo -e "${GREEN}Connecting to $selssid..${RESET}"
-            sudo wpa_cli reconfigure
-
-            if sudo iw "$INTERFACE" link | grep -q "$selssid"; then
-                echo -e "${GREEN}Connection successful!${RESET}"
-                break
-            else
-                echo -e "${RED}Failed to connect to $selssid. Check your passphrase or router and retry..${RESET}"
-                sleep 2
-                continue
-            fi
-        done
+                if sudo iw "$wafai" link | grep -q "$selssid"; then
+                    echo -e "${GREEN}Connection successful!${RESET}"
+                    break
+                else
+                    echo -e "${RED}Failed to connect to $selssid. Check your passphrase or router and retry...${RESET}"
+                    sleep 2
+                    continue
+                fi
+            done
+        fi
     else
-        echo "${GREEN}Connection is ensured!${RESET}"
+        echo -e "${GREEN}Connection is ensured!${RESET}"
         sleep 2
     fi
 else
-    echo "${GREEN}Connection is ensured!${RESET}"
+    echo -e "${GREEN}Connection is ensured!${RESET}"
     sleep 2
 fi
 
