@@ -126,7 +126,7 @@ if [[ "$PARTCONFIRM" == "y" || "$PARTCONFIRM" == "Y" ]]; then
             read MSDOSPARTCONFIRM
 
             DSKSZB=$(lsblk -b -o SIZE -n $PARTON2)
-            DSKSZGT=$(echo "$DSKSZB / 1024 / 1024 / 1024" | bc)
+            DSKSZGT=$(echo "$DSKSZB / 1024 / 1024 / 1024" | bc )
 
             if [[ "$UNIT" == "G" ]]; then
                 GTSIZE=$SIZE
@@ -196,12 +196,6 @@ done
 
 
 clear
-#!/bin/bash
-RED='\033[31m'
-YELLOW='\033[33m'
-GREEN='\033[32m'
-RESET='\033[0m'
-clear
 
 echo -e "${GREEN}Sect 2: Installing Kernel${RESET}"
 
@@ -212,12 +206,7 @@ declare -A real_krnls=(
     ["krnl4"]="linux-rt"
 )
 
-getpacksc="null"
-
-kch1="krnl1"
-kch2="krnl2"
-kch3="krnl3"
-kch4="krnl4"
+getpacksc="pacstrap -K /mnt base linux linux-firmware"
 
 while true; do
     echo -n -e "${YELLOW}Do you want to select the kernel you want to use? If not, the regular linux kernel will be installed. (y/n): ${RESET}"
@@ -229,15 +218,9 @@ while true; do
             echo -e "${YELLOW}$key -> ${real_krnls[$key]}${RESET}"
         done
 
-        echo -e "${GREEN}Kernel Options:${RESET}"
-        echo -e "${GREEN}krnl1 = linux-lts${RESET}"
-        echo -e "${GREEN}krnl2 = linux-hardened${RESET}"
-        echo -e "${GREEN}krnl3 = linux-zen${RESET}"
-        echo -e "${GREEN}krnl4 = linux-rt${RESET}"
         echo -n -e "${YELLOW}Name one or multiple kernel options (separated by space): ${RESET}"
         read -a kchi_list
 
-        getpacksc="pacstrap -K /mnt base linux linux-firmware"
         for kchi in "${kchi_list[@]}"; do
             if [[ -n "${real_krnls[$kchi]}" ]]; then
                 getpacksc="$getpacksc ${real_krnls[$kchi]}"
@@ -269,22 +252,9 @@ while true; do
         fi
 
     elif [[ "$mrekrnl" == 'N' || "$mrekrnl" == 'n' ]]; then
-        getpacksc="pacstrap -K /mnt base linux linux-firmware"
         echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
         break
 
-        read -n 1 -s glbe
-        if [[ "$glbe" == $'\x7f' ]]; then
-            echo -e "${RED}Cancelled. Restarting...${RESET}"
-            clear
-            continue
-        elif [[ "$glbe" == " " ]]; then
-            echo -e "${YELLOW}Validating...${RESET}"
-            echo -e "${GREEN}Validated!${RESET}"
-            sleep 2
-            clear
-            break
-        fi
     else
         echo -e "${RED}Invalid input. Please enter Y or N.${RESET}"
         continue
@@ -297,6 +267,7 @@ echo -e "${GREEN}Sit back and relax while kernel installs!${RESET}"
 sleep 2
 
 eval "$getpacksc"
+
 
 
 clear
@@ -336,6 +307,7 @@ In this setup, you have the option to sync your system clock with the hardware c
 You can choose whether to set up this synchronization in the next step. If you're unsure or just want to leave it as is, you can skip this part. However, if you prefer your hardware clock to be in sync with your system time, this option will ensure everything stays accurate across reboots.${RESET}"
           echo -e "${YELLOW}Press any key to return...${RESET}"
           read -n 1 -s
+          clear
           continue
     fi
 done
@@ -351,7 +323,7 @@ read accek
 if [[ "$accek" == "Y" || "$accek" == "y" ]]; then
     echo -e "${GREEN}Great, time is all set now.${RESET}"
     sleep 2
-elif [[ "$accek" == "n" || "$accek" == 'n' ]]; then
+elif [[ "$accek" == "n" || "$accek" == "N" ]]; then
     echo -e "${YELLOW}Attempting to fix..${RESET}"
     sudo hwclock --hctosys
     echo -e "${YELLOW}Is it accurate now?${RESET}"
@@ -371,8 +343,7 @@ elif [[ "$accek" == "n" || "$accek" == 'n' ]]; then
                 echo -e "${GREEN}Time set as $tinp!${RESET}"
                 break
             else
-                echo -e "${RED}ERROR: Invalid Input ${RESET}"
-                continue
+                echo -e "${RED}ERROR: Invalid Input. Please enter the time in the correct format (YYYY-MM-DD HH:MM:SS).${RESET}"
             fi
         done
     fi
@@ -934,7 +905,7 @@ joeinit() {
 replace_arch "/etc/os-release"
 sudo sed -i 's/ID=arch/ID=joneos/' /etc/os-release
 sudo sed -i 's/PRETTY_NAME="Arch Linux"/PRETTY_NAME="JOne OS"/' /etc/os-release
-sudo sed -i 's/VERSION=".*"/VERSION="JOne OS 1.0"/' /etc/os-release
+sudo sed -i 's/VERSION=".*"/VERSION="JOne OS Test Build"/' /etc/os-release
 
 replace_arch "/etc/issue"
 echo "Welcome to JOne OS" | sudo tee /etc/issue > /dev/null
