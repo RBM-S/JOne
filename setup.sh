@@ -343,10 +343,11 @@ done
 
 
 tvar=$(timedatectl)
-echo -e"${YELLOW}Is this information accurate?${RESET}"
+echo -e "${YELLOW}Is this information accurate?${RESET}"
 echo -e "${YELLOW}$tvar${RESET}"
 echo -e -n "${YELLOW}(y/n): ${RESET}"
 read accek
+
 if [[ "$accek" == "Y" || "$accek" == "y" ]]; then
     echo -e "${GREEN}Great, time is all set now.${RESET}"
     sleep 2
@@ -355,24 +356,25 @@ elif [[ "$accek" == "n" || "$accek" == 'n' ]]; then
     sudo hwclock --hctosys
     echo -e "${YELLOW}Is it accurate now?${RESET}"
     echo "${YELLOW}$tvar${RESET}"
-    echo -e -n "${YELLOW}(y/n)${RESET}"
+    echo -e -n "${YELLOW}(y/n): ${RESET}"
     read accek2
+
     if [[ "$accek2" == 'Y' || "$accek2" == 'y' ]]; then
         echo -e "${GREEN}Great, time is all set now.${RESET}"
-    elif [[ $accek2 == 'N' || "$accek2" == 'n' ]]; then
+    elif [[ "$accek2" == 'N' || "$accek2" == 'n' ]]; then
         echo -e "${RED}Apologies for the inconvenience, you will have to set the time up manually, but it isn't hard, so don't worry.${RESET}"
         while true; do
-            echo -e "${YELLOW}Enter time manually (YYYY-MM-DD HH:MM:SS)"
-        read tinp
-        if [[ -n "$tinp" ]]; then
-            sudo hwclock --set --date="$tinp"
-            echo -e "${GREEN}Time set as $tinp!${RESET}"
-            break
-        else
-            echo -e "${RED}ERROR: Invalid Input ${RESET}"
-            continue
+            echo -e "${YELLOW}Enter time manually (YYYY-MM-DD HH:MM:SS): ${RESET}"
+            read tinp
+            if [[ "$tinp" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$ ]]; then
+                sudo hwclock --set --date="$tinp"
+                echo -e "${GREEN}Time set as $tinp!${RESET}"
+                break
+            else
+                echo -e "${RED}ERROR: Invalid Input ${RESET}"
+                continue
+            fi
         done
-        fi
     fi
 fi
 
