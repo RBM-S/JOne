@@ -271,9 +271,6 @@ while true; do
     elif [[ "$mrekrnl" == 'N' || "$mrekrnl" == 'n' ]]; then
         getpacksc="pacstrap -K /mnt base linux linux-firmware"
         echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
-        echo -e "${YELLOW}Press Spacebar to continue or Backspace to cancel.${RESET}"
-        sleep 10
-        echo -e "${YELLOW}Waited 10 seconds and no input, confirming Kernel.${RESET}"
         break
 
         read -n 1 -s glbe
@@ -317,13 +314,6 @@ echo -e "${GREEN}Configuring the Time${RESET}"
 echo ""
 echo ""
 echo ""
-wsiHWCLOCK = "${GREEN}When you start up your computer, the system clock is one of the first things to initialize. This clock is responsible for keeping track of the current time while your computer is running. However, your system clock isn't the only clock in your computer. There’s also a hardware clock, known as the Real-Time Clock (RTC), that’s built into the motherboard and continues running even when the system is powered off.
-
-The hardware clock stores the time and date and ensures that your system time is accurate when you boot up, even if you don’t have an internet connection or if the system clock was reset. This is especially important for maintaining time when your computer is off or after a power failure.
-
-In this setup, you have the option to sync your system clock with the hardware clock (or vice versa) using the hwclock tool. This ensures that your system clock is accurate from the moment you start your computer. The system clock and hardware clock can work together to keep your computer’s time in sync, which can help avoid issues with time-based tasks or logs.
-
-You can choose whether to set up this synchronization in the next step. If you're unsure or just want to leave it as is, you can skip this part. However, if you prefer your hardware clock to be in sync with your system time, this option will ensure everything stays accurate across reboots.${RESET}"
 while true; do
     echo -e "${YELLOW}NOTE: Type in whatisit for the definition of hwclock.${RESET}"
     echo -e -n "${YELLOW}Do you want to set up hwclock? (y/n): "
@@ -332,11 +322,18 @@ while true; do
         echo -e "${GREEN}Setting up hwclock...${RESET}"
         sudo hwclock --systohc
         echo -e "${GREEN}hwclock was set up!${RESET}"
+        break
     elif [[ "$hclkcnf" == 'N' || "$hclkcnf" == 'n' ]]; then
         echo -e "${GREEN}Skipping hwclock setup...${RESET}"
         break
     elif [[ "$hclkcnf" == "whatisit" ]]; then
-        echo -e "${YELLOW}$wsiHWCLOCK${RESET}"
+        echo -e "${YELLOW}When you start up your computer, the system clock is one of the first things to initialize. This clock is responsible for keeping track of the current time while your computer is running. However, your system clock isn't the only clock in your computer. There’s also a hardware clock, known as the Real-Time Clock (RTC), that’s built into the motherboard and continues running even when the system is powered off.
+
+The hardware clock stores the time and date and ensures that your system time is accurate when you boot up, even if you don’t have an internet connection or if the system clock was reset. This is especially important for maintaining time when your computer is off or after a power failure.
+
+In this setup, you have the option to sync your system clock with the hardware clock (or vice versa) using the hwclock tool. This ensures that your system clock is accurate from the moment you start your computer. The system clock and hardware clock can work together to keep your computer’s time in sync, which can help avoid issues with time-based tasks or logs.
+
+You can choose whether to set up this synchronization in the next step. If you're unsure or just want to leave it as is, you can skip this part. However, if you prefer your hardware clock to be in sync with your system time, this option will ensure everything stays accurate across reboots.${RESET}"
           echo -e "${YELLOW}Press any key to return...${RESET}"
           read -n 1 -s
           continue
