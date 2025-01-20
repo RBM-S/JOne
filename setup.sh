@@ -196,31 +196,34 @@ done
 
 
 clear
-
 echo -e "${GREEN}Sect 2: Installing Kernel${RESET}"
 
+
 declare -A real_krnls=(
-    ["krnl1"]="linux-lts"
-    ["krnl2"]="linux-hardened"
-    ["krnl3"]="linux-zen"
-    ["krnl4"]="linux-rt"
+    ["linux-lts"]="linux-lts"
+    ["linux-hardened"]="linux-hardened"
+    ["linux-zen"]="linux-zen"
+    ["linux-rt"]="linux-rt"
 )
+
 
 getpacksc="pacstrap -K /mnt base linux linux-firmware"
 
 while true; do
-    echo -n -e "${YELLOW}Do you want to select the kernel you want to use? If not, the regular linux kernel will be installed. (y/n): ${RESET}"
+    echo -e "${YELLOW}Do you want to select the kernel you want to use? If not, the regular linux kernel will be installed. (y/n): ${RESET}"
     read mrekrnl
 
     if [[ "$mrekrnl" == 'Y' || "$mrekrnl" == 'y' ]]; then
         echo -e "${YELLOW}Available Kernel Options:${RESET}"
         for key in "${!real_krnls[@]}"; do
-            echo -e "${YELLOW}$key -> ${real_krnls[$key]}${RESET}"
+            echo -e "${YELLOW}$key${RESET}"
         done
 
+        echo -e "${YELLOW}NOTE: You can write 'all' for all kernels."
         echo -n -e "${YELLOW}Name one or multiple kernel options (separated by space): ${RESET}"
         read -a kchi_list
 
+        
         for kchi in "${kchi_list[@]}"; do
             if [[ -n "${real_krnls[$kchi]}" ]]; then
                 getpacksc="$getpacksc ${real_krnls[$kchi]}"
@@ -244,7 +247,7 @@ while true; do
                 echo -e "${GREEN}Validated!${RESET}"
                 sleep 2
                 clear
-                break
+                break  
             else
                 echo -e "${RED}No valid kernels selected. Restarting...${RESET}"
                 continue
@@ -253,10 +256,15 @@ while true; do
 
     elif [[ "$mrekrnl" == 'N' || "$mrekrnl" == 'n' ]]; then
         echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
-        break
+        break  
+
+    elif [[ "$mrekrnl" == 'all' || "$mrekrnl" == 'All' ]]; then
+        getpacksc="pacstrap -K /mnt base linux linux-firmware ${real_krnls[@]}"
+        echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
+        break 
 
     else
-        echo -e "${RED}Invalid input. Please enter Y or N.${RESET}"
+        echo -e "${RED}Invalid input. Please enter Y, N, or 'all' for all kernels.${RESET}"
         continue
     fi
 done
@@ -266,7 +274,10 @@ read -n 1 -s
 echo -e "${GREEN}Sit back and relax while kernel installs!${RESET}"
 sleep 2
 
+
 eval "$getpacksc"
+
+
 
 
 
