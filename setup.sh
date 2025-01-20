@@ -6,7 +6,7 @@ RESET='\033[0m'
 clear
 
 echo -e "${GREEN}Welcome to the JOne OS Setup, this will set your system up to use JOne OS through the Arch Linux Live CD${RESET}"
-echo -e "${YELLOW}Current Build: JOne OS Test Build${RESET}"
+echo -e "${YELLOW}Current Build: JOne OS 1.0${RESET}"
 echo -e "${YELLOW}Press any key to continue..${RESET}"
 read -n 1 -s
 
@@ -272,6 +272,9 @@ while true; do
         getpacksc="pacstrap -K /mnt base linux linux-firmware"
         echo -e "${YELLOW}Kernel Installation Command: $getpacksc${RESET}"
         echo -e "${YELLOW}Press Spacebar to continue or Backspace to cancel.${RESET}"
+        sleep 10
+        echo -e "${YELLOW}Waited 10 seconds and no input, confirming Kernel.${RESET}"
+        break
 
         read -n 1 -s glbe
         if [[ "$glbe" == $'\x7f' ]]; then
