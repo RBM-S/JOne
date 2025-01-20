@@ -338,8 +338,11 @@ if [[ "$accek" == "Y" || "$accek" == "y" ]]; then
 elif [[ "$accek" == "n" || "$accek" == "N" ]]; then
     echo -e "${YELLOW}Attempting to fix..${RESET}"
     sudo hwclock --hctosys
+
+    tvar=$(timedatectl)
+    
     echo -e "${YELLOW}Is it accurate now?${RESET}"
-    echo "${YELLOW}$tvar${RESET}"
+    echo -e "${YELLOW}$tvar${RESET}"
     echo -e -n "${YELLOW}(y/n): ${RESET}"
     read accek2
 
@@ -360,6 +363,7 @@ elif [[ "$accek" == "n" || "$accek" == "N" ]]; then
         done
     fi
 fi
+
 
 clear
 
